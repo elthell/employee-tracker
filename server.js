@@ -67,10 +67,10 @@ async function userChoice() {
       addDepartment();
     } else if (userAnswer === "Add A Role") {
       addRole();
-      // } else if (userAnswer === "Add An Employee") {
-      //   addEmployee();
-      // } else if (userAnswer === "Update An Employee's Role") {
-      //   updateEmployee();
+    } else if (userAnswer === "Add An Employee") {
+      addEmployee();
+    } else if (userAnswer === "Update An Employee's Role") {
+      updateEmployee();
     } else {
       console.log("Uh oh! Something went wrong.");
     }
@@ -157,13 +157,21 @@ const addRole = () => {
         type: "input",
         message: "Please enter the role's salary",
       },
+      {
+        name: "department",
+        type: "list",
+        message: "Please select the associated department",
+        choices: selectDepartment(),
+      },
     ])
     .then((answer) => {
+      const departmentId = selectDepartment().indexOf(answer.department) + 1;
       db.query(
         "INSERT INTO role SET ? ",
         {
           title: answer.title,
           salary: answer.salary,
+          department_id: departmentId,
         },
         (err) => {
           if (err) throw err;
@@ -173,10 +181,94 @@ const addRole = () => {
       );
     });
 };
+// Add An Employee //
+const addEmployee = () => {
+  inquirer
+    .prompt([
+      {
+        name: "firstName",
+        type: "input",
+        message: "Please enter the employee's first name.",
+      },
+      {
+        name: "lastName",
+        type: "input",
+        message: "Please enter their last name.",
+      },
+      {
+        name: "role",
+        type: "list",
+        message: "Please select the employee's role.",
+        choices: selectRole(),
+      },
+      {
+        name: "choice",
+        type: "list",
+        message: "Please select the employee's manager.",
+        choices: selectManager(),
+      },
+    ])
+    .then((answer) => {
+      const roleId = selectRole().indexOf(answer.role) + 1;
+      const managerId = selectManager().indexOf(answer.choice) + 1;
+      connection.query(
+        "INSERT INTO employee SET ?",
+        {
+          first_name: answer.firstName,
+          last_name: answer.lastName,
+          manager_id: managerId,
+          role_id: roleId,
+        },
+        (err) => {
+          if (err) throw err;
+          console.log(answer);
+          userChoice();
+        }
+      );
+    });
+};
 
 // =========== === ========== //
 
 // =========== Update ========== //
+
+// Update Employee //
+const updateEmployee = () => {
+  inquirer
+    .prompt([
+      {
+        name: "employee",
+        type: "list",
+        message: "Please choose an employee to update.",
+        choices: selectEmployee(),
+      },
+      {
+        name: "role",
+        type: "list",
+        message: "Please choose their new role.",
+        choices: selectRole(),
+      },
+    ])
+    .then((answer) => {
+      const roleId = selectRole().indexOf(answer.role) + 1;
+      connection.query(
+        "INSERT INTO employee SET WHERE ?",
+        {
+          first_name: answer.firstName,
+          last_name: answer.lastName,
+        },
+        {
+          role_id: roleId
+        }, 
+        (err) => {
+          if (err) throw err;
+          console.log(answer);
+          userChoice();
+        }
+      );
+    });
+};
+
 // =========== ====== ========== //
 
 // =========== Utils ========== //
@@ -192,7 +284,7 @@ const selectDepartment = () => {
     }
   });
   return allDepartments;
-}
+};
 // select a role //
 const allRoles = [];
 const selectRole = () => {
@@ -204,20 +296,32 @@ const selectRole = () => {
     }
   });
   return allRoles;
-}
+};
 // select a manager //
 const allManagers = [];
 const selectManager = () => {
-  const sql = "SELECT first_name, last_name FROM employee WHERE manager_id IS NULL"
+  const sql =
+    "SELECT first_name, last_name FROM employee WHERE manager_id IS NULL";
   db.query(sql, (err, rows) => {
-    if (err) throw err
+    if (err) throw err;
     for (var i = 0; i < rows.length; i++) {
       allManagers.push(rows[i].first_name);
     }
-
-  })
+  });
   return allManagers;
-}
+};
+// select an employee //
+const allEmployees = [];
+const selectEmployee = () => {
+  const sql = "SELECT * FROM employees";
+  db.query(sql, (err, rows) => {
+    if (err) throw err;
+    for (var i = 0; i < rows.length; i++) {
+      allEmployees.push(rows[i].first_name);
+    }
+  });
+  return allEmployees;
+};
 
 // =========== ===== ========== //
 
