@@ -63,6 +63,47 @@ async function questions() {
   }
 }
 
+// ======================================== Functions ========================================= //
+
+// =========== View ========== //
+// View All Departments //
+function viewDepartments() {
+  const sql = "SELECT department.name AS Departments FROM department;";
+
+  db.query(sql, (err, rows) => {
+    if (err) throw err
+    console.log(rows)
+    questions();
+  });
+};
+// View All Roles //
+function viewRoles() {
+  const sql ="SELECT role.title, role.salary, department.name AS Department FROM role JOIN department on department.id = role.department_id ORDER BY department;"
+
+  db.query(sql, (err, rows) => {
+    if (err) throw err
+    console.log(rows)
+    questions();
+  });
+};
+// View All Employees //
+function viewEmployees() {
+  const sql = "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name AS department FROM employee JOIN role on role.id = employee.role_id JOIN department on department.id = role.department_id ORDER BY department;"
+
+  db.query(sql, (err, rows) => {
+    if (err) throw err
+    console.log(rows)
+    questions();
+  });
+};
+
+// =========== Add ========== //
+
+
+// =========== Update ========== //
+
+// ======================================== ========= ========================================= //
+
 // default response
 app.use((req, res) => {
   res.status(404).end();
