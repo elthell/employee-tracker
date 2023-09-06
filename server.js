@@ -2,6 +2,7 @@
 const express = require("express");
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
+const { printTable } = require("console-table-printer");
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -86,7 +87,7 @@ const viewDepartments = () => {
 
   db.query(sql, (err, rows) => {
     if (err) throw err;
-    console.log(rows);
+    printTable(rows);
     userChoice();
   });
 };
@@ -97,7 +98,7 @@ const viewRoles = () => {
 
   db.query(sql, (err, rows) => {
     if (err) throw err;
-    console.log(rows);
+    printTable(rows);
     userChoice();
   });
 };
@@ -108,7 +109,7 @@ const viewEmployees = () => {
 
   db.query(sql, (err, rows) => {
     if (err) throw err;
-    console.log(rows);
+    printTable(rows);
     userChoice();
   });
 };
@@ -176,6 +177,49 @@ const addRole = () => {
 // =========== === ========== //
 
 // =========== Update ========== //
+// =========== ====== ========== //
+
+// =========== Utils ========== //
+
+// select a department //
+const allDepartments = [];
+const selectDepartment = () => {
+  const sql = "SELECT * FROM department";
+  db.query(sql, (err, rows) => {
+    if (err) throw err;
+    for (var i = 0; i < rows.length; i++) {
+      allDepartments.push(rows[i].name);
+    }
+  });
+  return allDepartments;
+}
+// select a role //
+const allRoles = [];
+const selectRole = () => {
+  const sql = "SELECT * FROM role";
+  db.query(sql, (err, rows) => {
+    if (err) throw err;
+    for (var i = 0; i < rows.length; i++) {
+      allRoles.push(rows[i].title);
+    }
+  });
+  return allRoles;
+}
+// select a manager //
+const allManagers = [];
+const selectManager = () => {
+  const sql = "SELECT first_name, last_name FROM employee WHERE manager_id IS NULL"
+  db.query(sql, (err, rows) => {
+    if (err) throw err
+    for (var i = 0; i < rows.length; i++) {
+      allManagers.push(rows[i].first_name);
+    }
+
+  })
+  return allManagers;
+}
+
+// =========== ===== ========== //
 
 // ======================================== ========= ========================================= //
 
