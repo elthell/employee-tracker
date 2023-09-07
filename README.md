@@ -18,7 +18,7 @@ node server.js
 
 Demonstration: 
 
-![Video demonstration of the database tables being viewed and added to.]()
+![Video demonstration of the database tables being viewed, added to, and updated.](./assets/employee-tracker.gif)
 
 ## Credits
 
