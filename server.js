@@ -251,13 +251,11 @@ const updateEmployee = () => {
     ])
     .then((answer) => {
       console.log(answer);
-      const employeeName = answer.employee;
+      const employeeId = selectEmployee().indexOf(answer.employee) + 1;
       const roleId = selectRole().indexOf(answer.role) + 1;
-      const sql = "UPDATE employee SET role_id = ?, WHERE first_name = ?";
-      console.log(employeeName);
-      // check the manual that corresponds to your MySQL server version 
-      // for the right syntax to use near 'WHERE first_name = 'Claire'' at line 1 --> not sure how to fix
-      db.query(sql, [roleId, employeeName], (err) => {
+      const sql =
+        "UPDATE employee SET employee.role_id = ? WHERE employee.id = ?";
+      db.query(sql, [roleId, employeeId], (err) => {
         if (err) throw err;
         console.log(answer);
         viewEmployees();
@@ -308,7 +306,7 @@ const selectManager = () => {
 // select an employee //
 const allEmployees = [];
 const selectEmployee = () => {
-  const sql = "SELECT first_name, last_name FROM employee";
+  const sql = "SELECT * FROM employee";
   db.query(sql, (err, rows) => {
     if (err) throw err;
     for (var i = 0; i < rows.length; i++) {
