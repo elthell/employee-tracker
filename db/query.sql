@@ -1,1 +1,1 @@
-SELECT role.title, role.salary, department.name AS Department FROM role JOIN department on department.id = role.department_id ORDER BY department;
+SELECT * FROM employee

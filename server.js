@@ -211,7 +211,7 @@ const addEmployee = () => {
     .then((answer) => {
       const roleId = selectRole().indexOf(answer.role) + 1;
       const managerId = selectManager().indexOf(answer.choice) + 1;
-      connection.query(
+      db.query(
         "INSERT INTO employee SET ?",
         {
           first_name: answer.firstName,
@@ -222,7 +222,7 @@ const addEmployee = () => {
         (err) => {
           if (err) throw err;
           console.log(answer);
-          userChoice();
+          viewEmployees();
         }
       );
     });
@@ -250,22 +250,18 @@ const updateEmployee = () => {
       },
     ])
     .then((answer) => {
+      console.log(answer);
+      const employeeName = answer.employee;
       const roleId = selectRole().indexOf(answer.role) + 1;
-      connection.query(
-        "INSERT INTO employee SET WHERE ?",
-        {
-          first_name: answer.firstName,
-          last_name: answer.lastName,
-        },
-        {
-          role_id: roleId
-        }, 
-        (err) => {
-          if (err) throw err;
-          console.log(answer);
-          userChoice();
-        }
-      );
+      const sql = "UPDATE employee SET role_id = ?, WHERE first_name = ?";
+      console.log(employeeName);
+      // check the manual that corresponds to your MySQL server version 
+      // for the right syntax to use near 'WHERE first_name = 'Claire'' at line 1 --> not sure how to fix
+      db.query(sql, [roleId, employeeName], (err) => {
+        if (err) throw err;
+        console.log(answer);
+        viewEmployees();
+      });
     });
 };
 
@@ -300,8 +296,7 @@ const selectRole = () => {
 // select a manager //
 const allManagers = [];
 const selectManager = () => {
-  const sql =
-    "SELECT first_name, last_name FROM employee WHERE manager_id IS NULL";
+  const sql = "SELECT first_name FROM employee WHERE manager_id IS NULL";
   db.query(sql, (err, rows) => {
     if (err) throw err;
     for (var i = 0; i < rows.length; i++) {
@@ -313,7 +308,7 @@ const selectManager = () => {
 // select an employee //
 const allEmployees = [];
 const selectEmployee = () => {
-  const sql = "SELECT * FROM employees";
+  const sql = "SELECT first_name, last_name FROM employee";
   db.query(sql, (err, rows) => {
     if (err) throw err;
     for (var i = 0; i < rows.length; i++) {
@@ -335,3 +330,5 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+console.log(selectEmployee());
